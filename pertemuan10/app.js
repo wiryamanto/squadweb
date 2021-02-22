@@ -29,11 +29,14 @@ app.get('/', (req, res) => { //request menangkap request dari luar , res merespo
     // res.send('CRUD Operation using NodeJS / ExpressJS / MySQL');
     let sql = "SELECT * FROM users"; //menampilkan data users
     let query = connection.query(sql, (err, rows) => {
-        if (err) throw err; //error handling
+        if (err){
+             throw err;
+        } else {//error handling
         res.render('user_index', {
             title: 'CRUD Operation using NodeJS / ExpressJS / MySQL',
             users: rows
         });
+    }
     });
 });
 
@@ -47,6 +50,35 @@ app.post('/save',(req, res)=> {
     let data = {nama:req.body.nama, email:req.body.email, telp:req.body.telp};
     let sql = "INSERT INTO users SET ?";
     let query = connection.query(sql, data,(err, result)=>{
+        if(err) throw err;
+        res.redirect('/');
+    });
+});
+
+app.get('/edit/:userId',(req,res)=>{
+    const userId= req.params.userId;
+    let sql = `select * from users where id= '${userId}'`
+    let query = connection.query(sql,(err, result)=>{
+        if(err) throw err;
+        res.render('user_edit',{
+            users :result[0]
+        })
+    })
+})
+
+app.post('/update',(req,res)=>{
+    const userId= req.body.id;
+    let sql = `update users set nama ='${req.body.nama}', email='${req.body.email}', telp=${req.body.telp} where id=${userId}`;
+    let query = connection.query(sql, (err, result)=>{
+        if(err) throw err;
+        res.redirect('/');
+    });
+});
+
+app.get('/delete/:userId',(req,res)=>{
+    const userId = req.params.userId;
+    let sql = `DELETE from users where id = '${userId}'`;
+    let query = connection.query(sql,(err, result)=>{
         if(err) throw err;
         res.redirect('/');
     });
